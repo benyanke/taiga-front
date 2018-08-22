@@ -37,6 +37,7 @@ class EventsService
         @.sessionId = sessionId
         @.subscriptions = {}
         @.connected = false
+        @.authsent = false
         @.error = false
         @.pendingMessages = []
 
@@ -170,12 +171,16 @@ class EventsService
         @.pendingMessages.push(message)
 
         if not @.connected
+             return
+
+        if not @.authsent
             return
 
         messages = _.map(@.pendingMessages, @.serialize)
         @.pendingMessages = []
 
         for msg in messages
+            // check if cmd == auth, and if so, set @.authsent = true here
             @.ws.send(msg)
 
     processMessage: (data) =>
